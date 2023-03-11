@@ -1,1 +1,1 @@
-# Trading
+# Downloading Stock Price Data from Yahoo Finance
