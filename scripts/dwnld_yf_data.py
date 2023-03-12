@@ -4,7 +4,7 @@ from datetime import datetime
 import yfinance as yf
 import os
 
-def download_data(start_date='', end_date='', symbol='', interval='1m', dest_folder='./'):
+def download_data(start_date='', end_date='', symbol='', interval='1m', dest_folder='../'):
     """
     This function downloads the stock price data from yahoo finance
     :param start_date: start date of the data to be downloaded
@@ -13,7 +13,7 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
     :param interval: interval of the data to be downloaded, default is 1 minute interval
     :param dest_folder: destination folder to save the data if not specified the data will be saved in the current folder
     :return: returns a csv file with the stock price data for the specified date range and stock symbol in the destination folder
-    
+
     sample usage: download_data(start_date='2020-01-01', end_date='2020-01-02', symbol='AAPL', interval='1m', dest_folder='./data')
     """
     # check if the date arguments are in the correct format
