@@ -42,11 +42,11 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
     if not os.path.exists(dest_folder):
         os.makedirs(dest_folder)
 
-    # if the interval is not 1m or 5m raise an error
-    if interval not in ['1m', '5m']:
-        raise ValueError('Interval should be 1m or 5m')
-    
     print((run_date - start_date).days)
+
+    # if the interval is not 1m or 5m or 15m raise an error
+    #if interval not in ['1m', '5m', '15m']:
+    #    raise ValueError('Interval should be 1m or 5m or 15m')
 
     # if the interval is 1m, the date range should be less than or equal to 7 days and the data should be with in 30 days from the current date
     if interval == '1m':
@@ -58,16 +58,27 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
         if (run_date - start_date).days > 30:
                 raise ValueError('Start date should be less than or equal to 30 days from the current date')
     
-    elif interval == '5m':
+    elif interval == '5m' or interval == '15m':
         # raise an error if the date range is greater than 30 days
         if (run_date - start_date).days >= 60:
                 raise ValueError('Start date should be less than or equal to 60 days from the current date')
+        
+    elif interval == '1h':
+        # raise an error if the date range is greater than 30 days
+        if (run_date - start_date).days >= 730:
+                raise ValueError('Start date should be less than or equal to 730 days from the current date')
     
     #download the stock price 1 minute interval data using yfinance library
     data = yf.download(symbol, start=start_date, end=end_date, interval=interval)
+    print(data.head())
 
-    # Convert the time zone to US/Eastern
-    data.index = data.index.tz_convert('US/Eastern')
-
+    try:
+         # Convert the time zone to US/Eastern
+        data.index = data.index.tz_convert('US/Eastern')
+    except:
+        # use tz_localize to localize the time zone to UTC
+        data.index = data.index.tz_localize('US/Eastern')
+        
+    print(data.head())
     # save the data to a csv file with the name of the stock symbol and the date range in the file name to a specific folder
     data.to_csv(f'./data/{symbol}_{start_date.strftime("%Y-%m-%d")}_{end_date.strftime("%Y-%m-%d")}.csv')
