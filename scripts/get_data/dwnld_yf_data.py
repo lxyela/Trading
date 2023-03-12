@@ -4,7 +4,7 @@ from datetime import datetime
 import yfinance as yf
 import os
 
-def download_data(start_date='', end_date='', symbol='', interval='1m', dest_folder='../'):
+def download_data(start_date='', end_date='', symbol='', interval='1m', dest_folder='./'):
     """
     This function downloads the stock price data from yahoo finance
     :param start_date: start date of the data to be downloaded
@@ -35,18 +35,16 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
     # check if the destintion folder path exists
     if not os.path.exists(dest_folder):
         raise ValueError('The destination folder path does not exist')
-    
-    # check if a folder named data/yahoo exists in the destination folder, if not create it
+
     dest_folder = os.path.join(dest_folder, 'data', 'yahoo_data')
     # check if dest_folder exists, if not create it
+    print(dest_folder)
     if not os.path.exists(dest_folder):
         os.makedirs(dest_folder)
 
-    print((run_date - start_date).days)
-
     # if the interval is not 1m or 5m or 15m raise an error
-    #if interval not in ['1m', '5m', '15m']:
-    #    raise ValueError('Interval should be 1m or 5m or 15m')
+    if interval not in ['1m', '2m', '5m', '15m', '30m', '60m', '1h', '1d', '5d', '1wk']:
+        raise ValueError('Interval should be 1m, 5m, 15m, 30m, 60m, 1h, 1d, 5d, 1wk')
 
     # if the interval is 1m, the date range should be less than or equal to 7 days and the data should be with in 30 days from the current date
     if interval == '1m':
@@ -59,18 +57,17 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
                 raise ValueError('Start date should be less than or equal to 30 days from the current date')
     
     elif interval == '5m' or interval == '15m':
-        # raise an error if the date range is greater than 30 days
+        # raise an error if the date range is greater than 60 days
         if (run_date - start_date).days >= 60:
                 raise ValueError('Start date should be less than or equal to 60 days from the current date')
         
     elif interval == '1h':
-        # raise an error if the date range is greater than 30 days
+        # raise an error if the date range is greater than 730 days
         if (run_date - start_date).days >= 730:
                 raise ValueError('Start date should be less than or equal to 730 days from the current date')
     
     #download the stock price 1 minute interval data using yfinance library
     data = yf.download(symbol, start=start_date, end=end_date, interval=interval)
-    print(data.head())
 
     try:
          # Convert the time zone to US/Eastern
@@ -81,4 +78,4 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
         
     print(data.head())
     # save the data to a csv file with the name of the stock symbol and the date range in the file name to a specific folder
-    data.to_csv(f'./data/{symbol}_{start_date.strftime("%Y-%m-%d")}_{end_date.strftime("%Y-%m-%d")}.csv')
+    data.to_csv(f'./data/{symbol}_{interval}_{start_date.strftime("%Y-%m-%d")}_{end_date.strftime("%Y-%m-%d")}.csv')
