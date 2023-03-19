@@ -1,3 +1,4 @@
 Trading.code-workspace
 data
 .ipynb_checkpoints
+__pycache__
