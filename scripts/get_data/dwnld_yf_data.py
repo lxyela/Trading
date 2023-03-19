@@ -3,6 +3,7 @@
 from datetime import datetime
 import yfinance as yf
 import os
+from utils.methods import *
 
 def download_data(start_date='', end_date='', symbol='', interval='1m', dest_folder='./'):
     """
@@ -17,12 +18,9 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
     sample usage: download_data(start_date='2020-01-01', end_date='2020-01-02', symbol='AAPL', interval='1m', dest_folder='./data')
     """
     # check if the date arguments are in the correct format
-    try:
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        run_date = datetime.now()
-    except ValueError:
-        raise ValueError('Incorrect date format, should be YYYY-MM-DD')
+    start_date = check_date_format(start_date, date_format='%Y-%m-%d')
+    end_date = check_date_format(start_date, date_format='%Y-%m-%d')
+    run_date = datetime.now()
     
     # check if the symbol is a string
     if not isinstance(symbol, str):
@@ -32,9 +30,8 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
     if not isinstance(dest_folder, str):
         raise ValueError('Destination folder should be a string')
     
-    # check if the destintion folder path exists
-    if not os.path.exists(dest_folder):
-        raise ValueError('The destination folder path does not exist')
+    # check if the destintion folder is a valid path
+    dest_folder = check_file_folder(dest_folder)
 
     dest_folder = os.path.join(dest_folder, 'data', 'yahoo_data')
     # check if dest_folder exists, if not create it
@@ -76,6 +73,7 @@ def download_data(start_date='', end_date='', symbol='', interval='1m', dest_fol
         # use tz_localize to localize the time zone to UTC
         data.index = data.index.tz_localize('US/Eastern')
         
-    print(data.head())
     # save the data to a csv file with the name of the stock symbol and the date range in the file name to a specific folder
-    data.to_csv(f'./data/{symbol}_{interval}_{start_date.strftime("%Y-%m-%d")}_{end_date.strftime("%Y-%m-%d")}.csv')
+    data.to_csv(f'{dest_folder}/{symbol}_{interval}_{start_date.strftime("%Y-%m-%d")}_{end_date.strftime("%Y-%m-%d")}.csv')
+
+    return data
